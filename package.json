@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "amqplib": "^0.10.7",
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "i18next": "^24.2.3",
+    "init": "^0.1.2",
+    "jsonwebtoken": "^9.0.2",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.14.1",
+    "pg-hstore": "^2.3.4",
+    "redis": "^4.7.0",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.1.0"
+  }
+}
