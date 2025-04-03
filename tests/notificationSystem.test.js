@@ -7,15 +7,13 @@ jest.mock('../models/user');
 
 describe('Notification System (Queuing)', () => {
     beforeAll(() => {
-        redis.publish = jest.fn(); // Mock Redis publish
-        redis.zadd = jest.fn(); // Mock Redis zadd
-        redis.zrangebyscore = jest.fn(); // Mock Redis zrangebyscore
-        redis.zrem = jest.fn(); // Mock Redis zrem
         redis.on = jest.fn((event, callback) => {
             if (event === 'message') {
                 callback('event_notifications', JSON.stringify({ eventId: 1, title: 'Test Event', categories: 'Music' }));
             }
         });
+        redis.zadd = jest.fn(); // Mock Redis zadd
+        redis.zrangebyscore = jest.fn(); // Mock Redis zrangebyscore
         console.log = jest.fn(); // Mock console.log
     });
 

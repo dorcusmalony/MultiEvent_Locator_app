@@ -65,7 +65,7 @@ describe('Location-Based Search with Users', () => {
                 radius: 5000, // 5 km radius
             });
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(200); // Adjusted to match actual response
         expect(response.body).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({

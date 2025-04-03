@@ -5,7 +5,6 @@ jest.mock('../models/user');
 
 describe('Notification Consumer', () => {
     beforeAll(() => {
-        redis.subscribe = jest.fn(); // Mock Redis subscribe
         redis.on = jest.fn((event, callback) => {
             if (event === 'message') {
                 callback('event_notifications', JSON.stringify({ eventId: 1, title: 'Test Event', categories: 'Music' }));

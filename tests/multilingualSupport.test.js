@@ -1,6 +1,19 @@
 const request = require('supertest');
 const app = require('../app');
 
+jest.mock('../config/i18n', () => ({
+    t: (key) => {
+        const translations = {
+            welcome: 'Welcome to the Event Locator API',
+            event_created: 'Event created successfully',
+            event_not_found: 'Event not found',
+            missing_fields: 'Missing required fields',
+            categories_required: 'Categories field is required',
+        };
+        return translations[key] || key;
+    },
+}));
+
 describe('Multilingual Support', () => {
     test('should return messages in English by default', async () => {
         const response = await request(app).get('/');

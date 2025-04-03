@@ -98,7 +98,7 @@ describe('Event Routes', () => {
             },
         ];
 
-        Event.sequelize.query.mockResolvedValue(mockEvents);
+        Event.findAll.mockResolvedValue(mockEvents);
 
         const response = await request(app).get('/api/events/search').query({
             latitude: 40.7128,
@@ -107,7 +107,7 @@ describe('Event Routes', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(mockEvents);
+        expect(response.body).toEqual(mockEvents); // Ensure mock data matches expected structure
     });
 
     test('GET /api/events - should filter events by category', async () => {
