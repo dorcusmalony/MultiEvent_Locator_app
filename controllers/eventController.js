@@ -1,33 +1,37 @@
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 const Event = require('../models/event');
+const { scheduleNotification } = require('../utils/scheduler');
 
 exports.createEvent = async (req, res) => {
     try {
         const { name, description, latitude, longitude, event_date, categories } = req.body;
 
         // Validate required fields
-        if (!name || !latitude || !longitude || !event_date) {
-            return res.status(400).json({ error: req.t('missing_fields') }); // Use translation
+        if (!name || latitude == null || longitude == null || !event_date || !categories) {
+            return res.status(400).json({
+                error: 'Missing required fields: name, latitude, longitude, event_date, and categories are required.',
+            });
         }
 
-        // Ensure categories is provided, otherwise return an error
-        if (!categories) {
-            return res.status(400).json({ error: req.t('categories_required') });
-        }
+        // Construct the GeoJSON object for the location
+        const location = {
+            type: 'Point',
+            coordinates: [longitude, latitude],
+        };
 
-        // Create the event with location
+        // Create the event
         const event = await Event.create({
             name,
             description,
             latitude,
             longitude,
+            location,
             event_date,
             categories,
-            location: sequelize.literal(`ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)`),
         });
 
-        res.status(201).json({ message: req.t('event_created'), event });
+        res.status(201).json({ message: 'Event created successfully', event });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -41,6 +45,7 @@ exports.getAllEvents = async (req, res) => {
         const whereClause = category ? { categories: category } : {};
 
         const events = await Event.findAll({ where: whereClause });
+
         res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -52,7 +57,7 @@ exports.getEventById = async (req, res) => {
         const eventId = parseInt(req.params.id, 10); // Convert ID to a number
         const event = await Event.findByPk(eventId);
         if (!event) {
-            return res.status(404).json({ error: req.t('event_not_found') });
+            return res.status(404).json({ error: 'Event not found' });
         }
         res.status(200).json(event);
     } catch (error) {

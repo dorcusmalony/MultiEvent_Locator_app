@@ -22,9 +22,9 @@ describe('Event Controller', () => {
             description: 'Test Description',
             latitude: 12.345678,
             longitude: 98.765432,
+            location: { type: 'Point', coordinates: [98.765432, 12.345678] },
             event_date: '2023-12-31T12:00:00Z',
             categories: 'Music',
-            location: sequelize.literal(`ST_SetSRID(ST_MakePoint(98.765432, 12.345678), 4326)`), // Add location field
         };
 
         Event.create.mockResolvedValue(mockEvent);
@@ -50,9 +50,9 @@ describe('Event Controller', () => {
             description: 'Test Description',
             latitude: 12.345678,
             longitude: 98.765432,
+            location: { type: 'Point', coordinates: [98.765432, 12.345678] },
             event_date: '2023-12-31T12:00:00Z',
             categories: 'Music',
-            location: sequelize.literal(`ST_SetSRID(ST_MakePoint(98.765432, 12.345678), 4326)`), // Add location field
         });
     });
 

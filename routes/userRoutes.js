@@ -1,12 +1,17 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const userController = require("../controllers/userController.js");
+const userController = require('../controllers/userController.js');
 
 // Register a user
-router.post("/register", userController.register); // Ensure this route exists
+router.post('/register', userController.register);
 
-// Updated routes
-router.post("/login", userController.login); // Ensure this route exists
-router.put("/:id", userController.updateUser);
+// Login a user
+router.post('/login', userController.login);
+
+// Logout a user
+router.post('/logout', userController.logout);
+
+// Update user details
+router.put('/:id', userController.updateUser);
 
 module.exports = router;

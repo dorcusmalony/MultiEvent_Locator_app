@@ -17,18 +17,17 @@ const Event = sequelize.define('Event', {
         type: DataTypes.DECIMAL(9, 6),
         allowNull: false,
     },
-    event_date: {
+    location: {
+        type: DataTypes.GEOMETRY('POINT', 4326),
+        allowNull: false,
+    },
+    event_date: { // Change "date" to "event_date"
         type: DataTypes.DATE,
         allowNull: false,
     },
     categories: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'General', // Set default value for categories
-    },
-    location: {
-        type: DataTypes.GEOMETRY('POINT'),
-        allowNull: true, // Ensure this matches the database schema
     },
 }, {
     timestamps: true,

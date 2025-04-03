@@ -1,4 +1,6 @@
 const express = require('express');
+const session = require('express-session');
+const passport = require('./config/passport'); // Import Passport configuration
 const app = express();
 const i18next = require('./config/i18n'); // Import i18n configuration
 const middleware = require('i18next-http-middleware');
@@ -7,6 +9,19 @@ const userRoutes = require('./routes/userRoutes'); // Import user routes
 
 // Middleware to parse JSON
 app.use(express.json());
+
+// Add session middleware
+app.use(
+    session({
+        secret: process.env.JWT_SECRET || 'your_jwt_secret',
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+
+// Initialize Passport.js
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Add i18next middleware
 app.use(middleware.handle(i18next));
