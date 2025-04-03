@@ -6,7 +6,7 @@ const eventController = require('../controllers/eventController');
 router.get('/events/search', eventController.searchEventsByLocation);
 
 // Create an event
-router.post('/events', eventController.createEvent);
+router.post('/events', eventController.createEvent); // Route for creating events
 
 // Get all events
 router.get('/events', eventController.getAllEvents);

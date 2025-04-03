@@ -10,29 +10,25 @@ const register = async (req, res) => {
         const user = await User.create({ username, email, password: hashedPassword, location, preferences });
         res.status(201).json({ message: 'User registered successfully', user });
     } catch (error) {
-        if (error instanceof Sequelize.UniqueConstraintError) {
-            const field = error.errors[0].path;
-            return res.status(400).json({ message: `${field} must be unique` });
-        }
         res.status(500).json({ message: 'Error registering user', error });
     }
 };
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
+    const { email, password } = req.body; // Extract email and password from the request body
+    const user = await User.findOne({ where: { email } }); // Find the user by email
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found' }); // Return 404 if user does not exist
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password); // Compare the hashed password
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid password' });
+      return res.status(401).json({ message: 'Invalid password' }); // Return 401 if password is incorrect
     }
-    const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: '1h' });
-    res.status(200).json({ message: 'Login successful', token });
+    const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: '1h' }); // Generate a JWT token
+    res.status(200).json({ message: 'Login successful', token }); // Return success response with token
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error });
+    res.status(500).json({ message: 'Error logging in', error }); // Handle server errors
   }
 };
 

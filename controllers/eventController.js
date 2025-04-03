@@ -8,7 +8,7 @@ exports.createEvent = async (req, res) => {
 
         // Validate required fields
         if (!name || !latitude || !longitude || !event_date) {
-            return res.status(400).json({ error: req.t('missing_fields') });
+            return res.status(400).json({ error: req.t('missing_fields') }); // Use translation
         }
 
         // Ensure categories is provided, otherwise return an error
