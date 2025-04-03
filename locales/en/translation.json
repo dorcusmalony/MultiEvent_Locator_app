@@ -1,0 +1,7 @@
+{
+    "welcome": "Welcome to the Event Locator API",
+    "event_created": "Event created successfully",
+    "event_not_found": "Event not found",
+    "missing_fields": "Missing required fields",
+    "categories_required": "Categories field is required"
+}

@@ -41,7 +41,10 @@ describe('Event Controller', () => {
             });
 
         expect(response.status).toBe(201);
-        expect(response.body).toEqual(mockEvent);
+        expect(response.body).toEqual({
+            message: 'Event created successfully',
+            event: mockEvent,
+        });
         expect(Event.create).toHaveBeenCalledWith({
             name: 'Test Event',
             description: 'Test Description',

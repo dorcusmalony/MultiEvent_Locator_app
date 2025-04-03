@@ -8,12 +8,12 @@ exports.createEvent = async (req, res) => {
 
         // Validate required fields
         if (!name || !latitude || !longitude || !event_date) {
-            return res.status(400).json({ error: 'Missing required fields' });
+            return res.status(400).json({ error: req.t('missing_fields') });
         }
 
         // Ensure categories is provided, otherwise return an error
         if (!categories) {
-            return res.status(400).json({ error: 'Categories field is required' });
+            return res.status(400).json({ error: req.t('categories_required') });
         }
 
         // Create the event with location
@@ -27,7 +27,7 @@ exports.createEvent = async (req, res) => {
             location: sequelize.literal(`ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)`),
         });
 
-        res.status(201).json(event);
+        res.status(201).json({ message: req.t('event_created'), event });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -52,7 +52,7 @@ exports.getEventById = async (req, res) => {
         const eventId = parseInt(req.params.id, 10); // Convert ID to a number
         const event = await Event.findByPk(eventId);
         if (!event) {
-            return res.status(404).json({ error: 'Event not found' });
+            return res.status(404).json({ error: req.t('event_not_found') });
         }
         res.status(200).json(event);
     } catch (error) {

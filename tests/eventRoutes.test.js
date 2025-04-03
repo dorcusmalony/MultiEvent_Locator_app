@@ -39,8 +39,8 @@ describe('Event Routes', () => {
 
     test('GET /api/events - should return all events', async () => {
         const mockEvents = [
-            { id: 1, name: 'Event 1', latitude: 12.34, longitude: 56.78, event_date: '2023-12-31T12:00:00Z', categories: 'Music' },
-            { id: 2, name: 'Event 2', latitude: 98.76, longitude: 54.32, event_date: '2023-11-30T12:00:00Z', categories: 'Art' },
+            { id: 1, name: 'Event 1', categories: 'Music' },
+            { id: 2, name: 'Event 2', categories: 'Art' },
         ];
 
         Event.findAll.mockResolvedValue(mockEvents);
@@ -130,17 +130,14 @@ describe('Event Routes', () => {
     });
 
     test('GET /api/events - should filter events by category', async () => {
-        const mockEvents = [
-            { id: 1, name: 'Music Concert', categories: 'Music' },
-            { id: 2, name: 'Art Exhibition', categories: 'Art' },
-        ];
+        const mockEvents = [{ id: 1, name: 'Music Concert', categories: 'Music' }];
 
-        Event.findAll.mockResolvedValue([mockEvents[0]]); // Return only the "Music" event
+        Event.findAll.mockResolvedValue(mockEvents);
 
         const response = await request(app).get('/api/events').query({ category: 'Music' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual([mockEvents[0]]);
+        expect(response.body).toEqual(mockEvents);
         expect(Event.findAll).toHaveBeenCalledWith({ where: { categories: 'Music' } });
     });
 });

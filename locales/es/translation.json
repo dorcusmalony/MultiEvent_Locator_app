@@ -1,0 +1,7 @@
+{
+    "welcome": "Bienvenido a la API de Localizador de Eventos",
+    "event_created": "Evento creado con éxito",
+    "event_not_found": "Evento no encontrado",
+    "missing_fields": "Faltan campos obligatorios",
+    "categories_required": "El campo de categorías es obligatorio"
+}
