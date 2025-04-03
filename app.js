@@ -19,7 +19,15 @@ app.use('/api/users', userRoutes); // Ensure this is registered
 
 // Default route for testing
 app.get('/', (req, res) => {
-    res.send(req.t('welcome')); // Use i18n translation
+    res.json({
+        message: req.t('welcome'), // Translated welcome message
+        translations: {
+            event_created: req.t('event_created'),
+            event_not_found: req.t('event_not_found'),
+            missing_fields: req.t('missing_fields'),
+            categories_required: req.t('categories_required'),
+        },
+    });
 });
 
 module.exports = app;
