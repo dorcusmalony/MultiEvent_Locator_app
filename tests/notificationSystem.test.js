@@ -11,6 +11,11 @@ describe('Notification System (Queuing)', () => {
         redis.zadd = jest.fn(); // Mock Redis zadd
         redis.zrangebyscore = jest.fn(); // Mock Redis zrangebyscore
         redis.zrem = jest.fn(); // Mock Redis zrem
+        redis.on = jest.fn((event, callback) => {
+            if (event === 'message') {
+                callback('event_notifications', JSON.stringify({ eventId: 1, title: 'Test Event', categories: 'Music' }));
+            }
+        });
         console.log = jest.fn(); // Mock console.log
     });
 
@@ -22,8 +27,8 @@ describe('Notification System (Queuing)', () => {
         const mockUsers = [{ email: 'testuser@example.com', preferences: ['Music'] }];
         User.findAll.mockResolvedValue(mockUsers);
 
-        const message = { eventId: 1, title: 'Test Event', categories: 'Music' };
-        redis.emit('message', 'event_notifications', JSON.stringify(message));
+        // Simulate the Redis message event
+        redis.on.mock.calls[0][1]('event_notifications', JSON.stringify({ eventId: 1, title: 'Test Event', categories: 'Music' }));
 
         expect(User.findAll).toHaveBeenCalledWith({
             where: { preferences: { [Op.contains]: ['Music'] } },

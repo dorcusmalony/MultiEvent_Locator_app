@@ -27,10 +27,10 @@ app.use(passport.session());
 app.use(middleware.handle(i18next));
 
 // Register event routes under the /api prefix
-app.use('/api', eventRoutes);
+app.use('/api/events', eventRoutes);
 
-// Register user routes
-app.use('/api/users', userRoutes); // Ensure this is registered
+// Register user routes under the /api prefix
+app.use('/api/users', userRoutes);
 
 // Default route for testing
 app.get('/', (req, res) => {

@@ -1,137 +1,121 @@
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 const Event = require('../models/event');
-const { scheduleNotification } = require('../utils/scheduler');
 
+// Create an event
 exports.createEvent = async (req, res) => {
-    try {
-        const { name, description, latitude, longitude, event_date, categories } = req.body;
+  try {
+    console.log('Request Body:', req.body); // Log the request body for debugging
+    const { name, description, latitude, longitude, event_date, categories } = req.body;
 
-        // Validate required fields
-        if (!name || latitude == null || longitude == null || !event_date || !categories) {
-            return res.status(400).json({
-                error: 'Missing required fields: name, latitude, longitude, event_date, and categories are required.',
-            });
-        }
-
-        // Construct the GeoJSON object for the location
-        const location = {
-            type: 'Point',
-            coordinates: [longitude, latitude],
-        };
-
-        // Create the event
-        const event = await Event.create({
-            name,
-            description,
-            latitude,
-            longitude,
-            location,
-            event_date,
-            categories,
-        });
-
-        res.status(201).json({ message: 'Event created successfully', event });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    // Validate required fields
+    if (!name || !latitude || !longitude || !event_date || !categories) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    const location = { type: 'Point', coordinates: [longitude, latitude] };
+    const event = await Event.create({ name, description, location, latitude, longitude, event_date, categories });
+    res.status(201).json({ message: 'Event created successfully', event });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+// Get all events
 exports.getAllEvents = async (req, res) => {
-    try {
-        const { category } = req.query;
-
-        // Build the query conditionally based on the category filter
-        const whereClause = category ? { categories: category } : {};
-
-        const events = await Event.findAll({ where: whereClause });
-
-        res.status(200).json(events);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+  try {
+    const events = await Event.findAll();
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+// Get an event by ID
 exports.getEventById = async (req, res) => {
-    try {
-        const eventId = parseInt(req.params.id, 10); // Convert ID to a number
-        const event = await Event.findByPk(eventId);
-        if (!event) {
-            return res.status(404).json({ error: 'Event not found' });
-        }
-        res.status(200).json(event);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+  try {
+    const event = await Event.findByPk(req.params.id);
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
     }
+    res.status(200).json(event);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+// Update an event by ID
 exports.updateEvent = async (req, res) => {
-    try {
-        const { name, description, latitude, longitude, event_date, categories } = req.body;
-        const eventId = parseInt(req.params.id, 10); // Convert ID to a number
-        const event = await Event.findByPk(eventId);
+  try {
+    const { id } = req.params;
+    const { name, description, latitude, longitude, event_date, categories } = req.body;
 
-        if (!event) {
-            return res.status(404).json({ error: 'Event not found' });
-        }
-
-        // Update the event
-        await event.update({
-            name,
-            description,
-            latitude,
-            longitude,
-            event_date,
-            categories: categories || event.categories, // Retain existing categories if not provided
-        });
-
-        res.status(200).json(event);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    // Validate required fields
+    if (!name || !latitude || !longitude || !event_date || !categories) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    const location = { type: 'Point', coordinates: [longitude, latitude] };
+    const event = await Event.findByPk(id);
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+    await event.update({ name, description, location, latitude, longitude, event_date, categories });
+    res.status(200).json({ message: 'Event updated successfully', event });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+// Delete an event by ID
 exports.deleteEvent = async (req, res) => {
-    try {
-        const eventId = parseInt(req.params.id, 10); // Convert ID to a number
-        const event = await Event.findByPk(eventId);
-        if (!event) {
-            return res.status(404).json({ error: 'Event not found' });
-        }
-        await event.destroy();
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+  try {
+    const { id } = req.params;
+    const event = await Event.findByPk(id);
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
     }
+    await event.destroy();
+    res.status(200).json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+// Search events by location and radius
 exports.searchEventsByLocation = async (req, res) => {
-    try {
-        const { latitude, longitude, radius } = req.query;
+  try {
+    const { latitude, longitude, radius } = req.query;
+    const events = await Event.findAll({
+      where: sequelize.where(
+        sequelize.fn(
+          'ST_DWithin',
+          sequelize.col('location'),
+          sequelize.fn('ST_MakePoint', longitude, latitude),
+          radius
+        ),
+        true
+      ),
+    });
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-        // Validate required query parameters
-        if (!latitude || !longitude || !radius) {
-            return res.status(400).json({ error: 'Latitude, longitude, and radius are required' });
-        }
-
-        // Query the database for events within the specified radius
-        const events = await sequelize.query(
-            `
-            SELECT * FROM events
-            WHERE ST_DWithin(
-                ST_SetSRID(ST_MakePoint(longitude, latitude), 4326),
-                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326),
-                :radius
-            )
-            `,
-            {
-                type: sequelize.QueryTypes.SELECT,
-                replacements: { latitude: parseFloat(latitude), longitude: parseFloat(longitude), radius: parseFloat(radius) },
-            }
-        );
-
-        res.status(200).json(events);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+// Filter events by category
+exports.filterEventsByCategory = async (req, res) => {
+  try {
+    const { category } = req.query;
+    const events = await Event.findAll({
+      where: {
+        categories: {
+          [Op.iLike]: `%${category}%`,
+        },
+      },
+    });
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

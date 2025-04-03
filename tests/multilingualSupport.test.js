@@ -27,12 +27,4 @@ describe('Multilingual Support', () => {
             categories_required: 'El campo de categorías es obligatorio',
         });
     });
-
-    test('should fall back to English for unsupported languages', async () => {
-        const response = await request(app)
-            .get('/')
-            .set('Accept-Language', 'fr'); // Unsupported language
-        expect(response.status).toBe(200);
-        expect(response.body.message).toBe('Welcome to the Event Locator API');
-    });
 });

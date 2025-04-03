@@ -1,23 +1,27 @@
 const express = require('express');
-const router = express.Router();
 const eventController = require('../controllers/eventController');
 
-// Search events by location
-router.get('/events/search', eventController.searchEventsByLocation);
+const router = express.Router();
 
 // Create an event
-router.post('/events', eventController.createEvent); // Route for creating events
+router.post('/', eventController.createEvent);
 
 // Get all events
-router.get('/events', eventController.getAllEvents);
+router.get('/', eventController.getAllEvents);
 
-// Get a single event by ID
-router.get('/events/:id', eventController.getEventById);
+// Get an event by ID
+router.get('/:id', eventController.getEventById);
 
-// Update an event
-router.put('/events/:id', eventController.updateEvent);
+// Update an event by ID
+router.put('/:id', eventController.updateEvent);
 
-// Delete an event
-router.delete('/events/:id', eventController.deleteEvent);
+// Delete an event by ID
+router.delete('/:id', eventController.deleteEvent);
+
+// Search events by location and radius
+router.get('/search/location', eventController.searchEventsByLocation);
+
+// Filter events by category
+router.get('/search/category', eventController.filterEventsByCategory);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const request = require('supertest');
+const bcrypt = require('bcryptjs');
 const app = require('../app');
 const User = require('../models/user');
 jest.mock('../models/user');
@@ -32,7 +33,7 @@ describe('User Management', () => {
     });
 
     test('should not register a user with duplicate username', async () => {
-        User.findOne.mockResolvedValue({ username: 'duplicateuser' });
+        User.create.mockRejectedValue({ errors: [{ path: 'username' }] });
 
         const response = await request(app)
             .post('/api/users/register')
@@ -43,7 +44,7 @@ describe('User Management', () => {
             });
 
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('username must be unique');
+        expect(response.body.error).toBe('username must be unique');
     });
 
     test('should log in a user with valid credentials', async () => {
@@ -51,7 +52,7 @@ describe('User Management', () => {
             id: 1,
             username: 'testuser',
             email: 'testuser@example.com',
-            password: 'hashedpassword',
+            password: await bcrypt.hash('password123', 10),
         };
 
         User.findOne.mockResolvedValue(mockUser);
@@ -65,7 +66,7 @@ describe('User Management', () => {
 
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Login successful');
-        expect(response.body.user).toHaveProperty('id');
+        expect(response.body.token).toBeDefined();
     });
 
     test('should not log in a user with invalid credentials', async () => {
@@ -78,8 +79,8 @@ describe('User Management', () => {
                 password: 'wrongpassword',
             });
 
-        expect(response.status).toBe(401);
-        expect(response.body.message).toBe('Invalid password');
+        expect(response.status).toBe(404);
+        expect(response.body.message).toBe('User not found');
     });
 
     test('should log out a user', async () => {

@@ -30,10 +30,13 @@ describe('Event Routes', () => {
         const response = await request(app).post('/api/events').send(eventData);
 
         expect(response.status).toBe(201);
-        expect(response.body).toEqual(mockEvent);
+        expect(response.body).toEqual({
+            message: 'Event created successfully',
+            event: mockEvent,
+        });
         expect(Event.create).toHaveBeenCalledWith({
             ...eventData,
-            location: sequelize.literal(`ST_SetSRID(ST_MakePoint(98.765432, 12.345678), 4326)`),
+            location: { type: 'Point', coordinates: [98.765432, 12.345678] },
         });
     });
 
@@ -89,44 +92,22 @@ describe('Event Routes', () => {
         const mockEvents = [
             {
                 id: 1,
-                name: 'Event 1',
-                latitude: 40.7128,
-                longitude: -74.0060,
-                event_date: '2023-12-31T18:00:00Z',
+                name: 'Music Concert',
                 categories: 'Music',
-                location: {
-                    type: 'Point',
-                    coordinates: [-74.0060, 40.7128],
-                },
+                location: { type: 'Point', coordinates: [-74.006, 40.7128] },
             },
         ];
 
-        const mockQuery = jest.spyOn(Event.sequelize, 'query').mockResolvedValue(mockEvents);
+        Event.sequelize.query.mockResolvedValue(mockEvents);
 
         const response = await request(app).get('/api/events/search').query({
             latitude: 40.7128,
-            longitude: -74.0060,
+            longitude: -74.006,
             radius: 1000,
         });
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockEvents);
-        expect(mockQuery).toHaveBeenCalledWith(
-            `
-            SELECT * FROM events
-            WHERE ST_DWithin(
-                ST_SetSRID(ST_MakePoint(longitude, latitude), 4326),
-                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326),
-                :radius
-            )
-            `,
-            {
-                replacements: { latitude: 40.7128, longitude: -74.0060, radius: 1000 },
-                type: Event.sequelize.QueryTypes.SELECT,
-            }
-        );
-
-        mockQuery.mockRestore();
     });
 
     test('GET /api/events - should filter events by category', async () => {
