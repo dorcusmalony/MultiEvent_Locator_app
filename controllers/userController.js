@@ -4,18 +4,18 @@ const { Sequelize } = require('sequelize');
 const User = require('../models/user');
 
 const register = async (req, res) => {
-  try {
-    const { username, email, password, location, preferences } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ username, email, password: hashedPassword, location, preferences });
-    res.status(201).json({ message: 'User registered successfully', user });
-  } catch (error) {
-    if (error instanceof Sequelize.UniqueConstraintError) {
-      const field = error.errors[0].path;
-      return res.status(400).json({ message: `${field} must be unique` });
+    try {
+        const { username, email, password, location, preferences } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({ username, email, password: hashedPassword, location, preferences });
+        res.status(201).json({ message: 'User registered successfully', user });
+    } catch (error) {
+        if (error instanceof Sequelize.UniqueConstraintError) {
+            const field = error.errors[0].path;
+            return res.status(400).json({ message: `${field} must be unique` });
+        }
+        res.status(500).json({ message: 'Error registering user', error });
     }
-    res.status(500).json({ message: 'Error registering user', error });
-  }
 };
 
 const login = async (req, res) => {

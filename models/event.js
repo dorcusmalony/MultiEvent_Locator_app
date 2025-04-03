@@ -24,6 +24,7 @@ const Event = sequelize.define('Event', {
     categories: {
         type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: 'General', // Set default value for categories
     },
     location: {
         type: DataTypes.GEOMETRY('POINT'),

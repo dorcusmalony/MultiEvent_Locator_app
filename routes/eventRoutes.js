@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const eventController = require('../controllers/eventController');
 
+// Search events by location
+router.get('/events/search', eventController.searchEventsByLocation);
+
 // Create an event
 router.post('/events', eventController.createEvent);
 
@@ -10,9 +13,6 @@ router.get('/events', eventController.getAllEvents);
 
 // Get a single event by ID
 router.get('/events/:id', eventController.getEventById);
-
-// Search events by location
-router.get('/events/search', eventController.searchEventsByLocation);
 
 // Update an event
 router.put('/events/:id', eventController.updateEvent);

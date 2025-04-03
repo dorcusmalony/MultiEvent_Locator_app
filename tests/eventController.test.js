@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
 const Event = require('../models/event');
+const sequelize = require('../config/database');
 
 jest.mock('../models/event');
 
@@ -23,6 +24,7 @@ describe('Event Controller', () => {
             longitude: 98.765432,
             event_date: '2023-12-31T12:00:00Z',
             categories: 'Music',
+            location: sequelize.literal(`ST_SetSRID(ST_MakePoint(98.765432, 12.345678), 4326)`), // Add location field
         };
 
         Event.create.mockResolvedValue(mockEvent);
@@ -47,6 +49,7 @@ describe('Event Controller', () => {
             longitude: 98.765432,
             event_date: '2023-12-31T12:00:00Z',
             categories: 'Music',
+            location: sequelize.literal(`ST_SetSRID(ST_MakePoint(98.765432, 12.345678), 4326)`), // Add location field
         });
     });
 

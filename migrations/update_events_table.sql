@@ -20,3 +20,7 @@ ALTER TABLE events
 ALTER TABLE events
     ALTER COLUMN name SET NOT NULL,
     ALTER COLUMN categories SET NOT NULL;
+
+-- Set default value for `categories`
+ALTER TABLE events
+    ALTER COLUMN categories SET DEFAULT 'General';

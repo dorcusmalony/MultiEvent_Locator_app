@@ -14,7 +14,7 @@ describe('Event Routes', () => {
         await sequelize.close(); // Close the database connection
     });
 
-    test('POST /api/events - should create an event', async () => {
+    test('POST /api/events - should create an event with categories', async () => {
         const eventData = {
             name: 'Test Event',
             description: 'Test Description',
@@ -31,6 +31,10 @@ describe('Event Routes', () => {
 
         expect(response.status).toBe(201);
         expect(response.body).toEqual(mockEvent);
+        expect(Event.create).toHaveBeenCalledWith({
+            ...eventData,
+            location: sequelize.literal(`ST_SetSRID(ST_MakePoint(98.765432, 12.345678), 4326)`),
+        });
     });
 
     test('GET /api/events - should return all events', async () => {
@@ -83,20 +87,30 @@ describe('Event Routes', () => {
 
     test('GET /api/events/search - should return events within a radius', async () => {
         const mockEvents = [
-            { id: 1, name: 'Event 1', latitude: 12.34, longitude: 56.78, event_date: '2023-12-31T12:00:00Z', categories: 'Music' },
+            {
+                id: 1,
+                name: 'Event 1',
+                latitude: 40.7128,
+                longitude: -74.0060,
+                event_date: '2023-12-31T18:00:00Z',
+                categories: 'Music',
+                location: {
+                    type: 'Point',
+                    coordinates: [-74.0060, 40.7128],
+                },
+            },
         ];
 
-        // Mock the sequelize query method to return the mockEvents
         const mockQuery = jest.spyOn(Event.sequelize, 'query').mockResolvedValue(mockEvents);
 
         const response = await request(app).get('/api/events/search').query({
-            latitude: 12.34,
-            longitude: 56.78,
+            latitude: 40.7128,
+            longitude: -74.0060,
             radius: 1000,
         });
 
-        expect(response.status).toBe(200); // Expect a 200 OK status
-        expect(response.body).toEqual(mockEvents); // Expect the response body to match the mockEvents
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockEvents);
         expect(mockQuery).toHaveBeenCalledWith(
             `
             SELECT * FROM events
@@ -107,11 +121,26 @@ describe('Event Routes', () => {
             )
             `,
             {
-                replacements: { latitude: 12.34, longitude: 56.78, radius: 1000 },
+                replacements: { latitude: 40.7128, longitude: -74.0060, radius: 1000 },
                 type: Event.sequelize.QueryTypes.SELECT,
             }
         );
 
-        mockQuery.mockRestore(); // Restore the original query method
+        mockQuery.mockRestore();
+    });
+
+    test('GET /api/events - should filter events by category', async () => {
+        const mockEvents = [
+            { id: 1, name: 'Music Concert', categories: 'Music' },
+            { id: 2, name: 'Art Exhibition', categories: 'Art' },
+        ];
+
+        Event.findAll.mockResolvedValue([mockEvents[0]]); // Return only the "Music" event
+
+        const response = await request(app).get('/api/events').query({ category: 'Music' });
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual([mockEvents[0]]);
+        expect(Event.findAll).toHaveBeenCalledWith({ where: { categories: 'Music' } });
     });
 });
