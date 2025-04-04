@@ -11,28 +11,31 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
+    validate: {
+      isEmail: true, // Ensure email is valid
+    },
   },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   location: {
-    type: DataTypes.GEOMETRY('POINT'),
-    allowNull: true,
+    type: DataTypes.GEOGRAPHY('POINT', 4326), // Use GEOGRAPHY to match the database schema
+    allowNull: false,
     validate: {
       isValidPoint(value) {
-        if (value && (!value.coordinates || value.type !== 'Point')) {
+        if (!value || value.type !== 'Point' || !Array.isArray(value.coordinates) || value.coordinates.length !== 2) {
           throw new Error('Invalid location format');
         }
       },
     },
   },
   preferences: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    allowNull: true,
+    type: DataTypes.ARRAY(DataTypes.STRING), // Store preferences as an array of strings
+    allowNull: false,
     validate: {
       isArray(value) {
-        if (value && !Array.isArray(value)) {
+        if (!Array.isArray(value)) {
           throw new Error('Preferences must be an array of strings');
         }
       },

@@ -1,11 +1,12 @@
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 const Event = require('../models/event');
+const { publishMessage } = require('../utils/publisher');
+const { scheduleNotification } = require('../utils/scheduler');
 
 // Create an event
 exports.createEvent = async (req, res) => {
   try {
-    console.log('Request Body:', req.body); // Log the request body for debugging
     const { name, description, latitude, longitude, event_date, categories } = req.body;
 
     // Validate required fields
@@ -13,11 +14,44 @@ exports.createEvent = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const location = { type: 'Point', coordinates: [longitude, latitude] };
-    const event = await Event.create({ name, description, location, latitude, longitude, event_date, categories });
+    // Validate date format
+    if (isNaN(Date.parse(event_date))) {
+      return res.status(400).json({ error: 'Invalid date format for event_date' });
+    }
+
+    // Format location as GeoJSON Point
+    const location = {
+      type: 'Point',
+      coordinates: [parseFloat(longitude), parseFloat(latitude)],
+    };
+
+    const event = await Event.create({
+      name,
+      description,
+      location,
+      latitude,
+      longitude,
+      event_date,
+      categories,
+    });
+
+    // Publish real-time notification
+    await publishMessage('event_notifications', {
+      eventId: event.id,
+      title: name,
+      categories,
+    });
+
+    // Schedule delayed notification
+    const eventTimestamp = new Date(event_date).getTime();
+    const notificationTimestamp = eventTimestamp - 24 * 60 * 60 * 1000; // 1 day before the event
+    if (notificationTimestamp > Date.now()) {
+      await scheduleNotification(event.id, { title: name, categories }, notificationTimestamp);
+    }
+
     res.status(201).json({ message: 'Event created successfully', event });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
 
@@ -86,20 +120,27 @@ exports.deleteEvent = async (req, res) => {
 exports.searchEventsByLocation = async (req, res) => {
   try {
     const { latitude, longitude, radius } = req.query;
+
+    // Validate required query parameters
+    if (!latitude || !longitude || !radius) {
+      return res.status(400).json({ error: 'Missing required query parameters' });
+    }
+
     const events = await Event.findAll({
       where: sequelize.where(
         sequelize.fn(
           'ST_DWithin',
           sequelize.col('location'),
-          sequelize.fn('ST_MakePoint', longitude, latitude),
+          sequelize.fn('ST_SetSRID', sequelize.fn('ST_MakePoint', longitude, latitude), 4326),
           radius
         ),
         true
       ),
     });
+
     res.status(200).json(events);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
 
@@ -107,6 +148,12 @@ exports.searchEventsByLocation = async (req, res) => {
 exports.filterEventsByCategory = async (req, res) => {
   try {
     const { category } = req.query;
+
+    // Validate required query parameter
+    if (!category) {
+      return res.status(400).json({ error: 'Missing required query parameter: category' });
+    }
+
     const events = await Event.findAll({
       where: {
         categories: {
@@ -114,8 +161,9 @@ exports.filterEventsByCategory = async (req, res) => {
         },
       },
     });
+
     res.status(200).json(events);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
