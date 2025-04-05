@@ -2,7 +2,7 @@
 
 
 ## Overview
-MultiEvent_Locator_app project is a web application that allows users to:
+The MultiEvent_Locator_app project is a web application that allows users to:
 - Register and log in securely with password hashing.
 - Set their location and preferred event categories.
 - Create, read, update, and delete events.
@@ -102,6 +102,108 @@ node consumers/notificationConsumer.js
 4. **Notifications**:
    - Notifications are automatically sent to users based on their preferences.
 
+## API Endpoints
+
+### User Management
+- **POST** `/api/users/register` - Register a new user.
+- **POST** `/api/users/login` - Log in a user and return a JWT token.
+- **PUT** `/api/users/:id` - Update user preferences or location.
+
+### Event Management
+- **POST** `/api/events` - Create a new event.
+- **GET** `/api/events` - Retrieve all events.
+- **GET** `/api/events/:id` - Retrieve a specific event by ID.
+- **PUT** `/api/events/:id` - Update an event by ID.
+- **DELETE** `/api/events/:id` - Delete an event by ID.
+
+### Search and Filtering
+- **GET** `/api/events/search/location` - Search for events within a specified radius.
+  - Query Parameters: `latitude`, `longitude`, `radius`
+- **GET** `/api/events/search/category` - Filter events by category.
+  - Query Parameters: `category`
+
+### Notifications
+- **POST** `/api/notifications/schedule` - Schedule a notification for an event.
+
+## API Examples
+
+### User Registration
+**Endpoint**: `POST /api/users/register`
+
+**Example Request Payload**:
+```json
+{
+  "username": "testuser",
+  "email": "testuser@example.com",
+  "password": "password123",
+  "location": { "type": "Point", "coordinates": [40.7128, -74.0060] },
+  "preferences": ["Music", "Sports"]
+}
+```
+
+**Example Response**:
+```json
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "testuser@example.com",
+    "location": { "type": "Point", "coordinates": [40.7128, -74.0060] },
+    "preferences": ["Music", "Sports"]
+  }
+}
+```
+
+### User Login
+**Endpoint**: `POST /api/users/login`
+
+**Example Request Payload**:
+```json
+{
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+```
+
+**Example Response**:
+```json
+{
+  "message": "Login successful",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Event Creation
+**Endpoint**: `POST /api/events`
+
+**Example Request Payload**:
+```json
+{
+  "name": "Music Concert",
+  "description": "A live music concert.",
+  "latitude": 40.73061,
+  "longitude": -73.935242,
+  "event_date": "2025-04-15T19:00:00.000Z",
+  "categories": ["Music"]
+}
+```
+
+**Example Response**:
+```json
+{
+  "message": "Event created successfully",
+  "event": {
+    "id": 1,
+    "name": "Music Concert",
+    "description": "A live music concert.",
+    "location": { "latitude": 40.73061, "longitude": -73.935242 },
+    "event_date": "2025-04-15T19:00:00.000Z",
+    "categories": ["Music"]
+  }
+}
+```
+
 ## Technical Choices
 1. **Backend Framework**: Node.js with Express.js for building RESTful APIs.
 2. **Database**: PostgreSQL with Sequelize ORM for data management.
@@ -171,3 +273,4 @@ project-root/
 - Integrate with a mapping service (e.g., Google Maps API) to display event locations on a map.
 - Add a feature to allow users to save favorite events.
 - Implement real-time updates for event changes.
+
