@@ -43,7 +43,7 @@ The MultiEvent_Locator_app project is a web application that allows users to:
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/event-locator.git
+   git clone https://github.com/dorcusmalony/MultiEvent_Locator_app.git
    cd event-locator
    ```
 
