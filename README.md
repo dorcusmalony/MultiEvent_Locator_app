@@ -1,8 +1,7 @@
-# MultiEvent_Locator_app
-
+# Event Locator Project
 
 ## Overview
-The MultiEvent_Locator_app project is a web application that allows users to:
+The Event Locator project is a web application that allows users to:
 - Register and log in securely with password hashing.
 - Set their location and preferred event categories.
 - Create, read, update, and delete events.
@@ -28,7 +27,7 @@ The MultiEvent_Locator_app project is a web application that allows users to:
    - Users can select their preferred language for the user interface.
 
 6. **Notification System**:
-   - Notifications are sent to users about upcoming events matching their preferences using Redis Pub/Sub.
+   - Notifications are sent to users about upcoming events matching their preferences using Redis for Pub/Sub and scheduling.
 
 7. **Unit Testing**:
    - Comprehensive tests for core functionalities.
@@ -43,7 +42,7 @@ The MultiEvent_Locator_app project is a web application that allows users to:
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/dorcusmalony/MultiEvent_Locator_app.git
+   git clone https://github.com/your-repo/event-locator.git
    cd event-locator
    ```
 
@@ -228,7 +227,6 @@ project-root/
 │   ├── redis.js
 │   ├── i18n.js
 │   ├── passport.js
-│   ├── rabbitmq.js
 │   └── sync.js
 ├── controllers/    # API controllers
 │   ├── userController.js
@@ -273,4 +271,14 @@ project-root/
 - Integrate with a mapping service (e.g., Google Maps API) to display event locations on a map.
 - Add a feature to allow users to save favorite events.
 - Implement real-time updates for event changes.
+
+   
+    
+
+
+
+   
+
+
+
 
