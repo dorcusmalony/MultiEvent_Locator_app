@@ -1,7 +1,7 @@
-# Event Locator Project
+# MultiEvent_Locator_app
 
 ## Overview
-The Event Locator project is a web application that allows users to:
+The MultiEvent_Locator_app is a web application that allows users to:
 - Register and log in securely with password hashing.
 - Set their location and preferred event categories.
 - Create, read, update, and delete events.
