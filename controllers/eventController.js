@@ -49,6 +49,7 @@ exports.createEvent = async (req, res) => {
       await scheduleNotification(event.id, { title: name, categories }, notificationTimestamp);
     }
 
+    await publishMessage('event_updates', { action: 'create', event });
     res.status(201).json({ message: 'Event created successfully', event });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error', details: error.message });
@@ -95,6 +96,7 @@ exports.updateEvent = async (req, res) => {
       return res.status(404).json({ error: 'Event not found' });
     }
     await event.update({ name, description, location, latitude, longitude, event_date, categories });
+    await publishMessage('event_updates', { action: 'update', event });
     res.status(200).json({ message: 'Event updated successfully', event });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -110,6 +112,7 @@ exports.deleteEvent = async (req, res) => {
       return res.status(404).json({ error: 'Event not found' });
     }
     await event.destroy();
+    await publishMessage('event_updates', { action: 'delete', eventId: id });
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });

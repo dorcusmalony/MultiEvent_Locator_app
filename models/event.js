@@ -37,6 +37,11 @@ const Event = sequelize.define('Event', {
   },
 }, {
   timestamps: true,
+  getterMethods: {
+    googleMapsUrl() {
+      return `https://www.google.com/maps?q=${this.latitude},${this.longitude}`;
+    },
+  },
 });
 
 module.exports = Event;

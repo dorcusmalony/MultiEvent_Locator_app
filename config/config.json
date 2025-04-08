@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "MosesAlier2023",
+    "database": "event_locator",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "MosesAlier2023",
+    "database": "event_locator_test",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "MosesAlier2023",
+    "database": "event_locator_prod",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

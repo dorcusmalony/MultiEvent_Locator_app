@@ -6,6 +6,8 @@ const i18next = require('./config/i18n'); // Import i18n configuration
 const middleware = require('i18next-http-middleware');
 const eventRoutes = require('./routes/eventRoutes');
 const userRoutes = require('./routes/userRoutes'); // Import user routes
+const reviewRoutes = require('./routes/reviewRoutes'); // Import review routes
+const favoriteRoutes = require('./routes/favoriteRoutes'); // Import favorite routes
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -31,6 +33,12 @@ app.use('/api/events', eventRoutes);
 
 // Register user routes under the /api prefix
 app.use('/api/users', userRoutes);
+
+// Register review routes under the /api prefix
+app.use('/api/reviews', reviewRoutes);
+
+// Register favorite routes under the /api prefix
+app.use('/api/favorites', favoriteRoutes);
 
 // Default route for testing
 app.get('/', (req, res) => {
