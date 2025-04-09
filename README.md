@@ -99,13 +99,97 @@ node consumers/notificationConsumer.js
 
 ### User Management
 - **POST** `/api/users/register` - Register a new user.
+  ```json
+  // Request Body
+  {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "securepassword",
+    "location": {
+      "type": "Point",
+      "coordinates": [40.7128, -74.0060]
+    },
+    "preferences": ["Music", "Sports"]
+  }
+
+  // Response
+  {
+    "message": "User registered successfully",
+    "user": {
+      "id": 1,
+      "username": "john_doe",
+      "email": "john@example.com",
+      "location": {
+        "type": "Point",
+        "coordinates": [40.7128, -74.0060]
+      },
+      "preferences": ["Music", "Sports"]
+    }
+  }
+  ```
+
 - **POST** `/api/users/login` - Log in a user and return a JWT token.
+  ```json
+  // Request Body
+  {
+    "email": "john@example.com",
+    "password": "securepassword"
+  }
+
+  // Response
+  {
+    "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+  ```
+
 - **PUT** `/api/users/:id` - Update user preferences or location.
 
 ### Event Management
 - **POST** `/api/events` - Create a new event.
+  ```json
+  // Request Body
+  {
+    "name": "Art Exhibition",
+    "description": "An exhibition showcasing modern art.",
+    "latitude": 40.73061,
+    "longitude": -73.935242,
+    "event_date": "2023-12-20T18:00:00Z",
+    "categories": "Art"
+  }
+
+  // Response
+  {
+    "message": "Event created successfully",
+    "event": {
+      "id": 101,
+      "name": "Art Exhibition",
+      "description": "An exhibition showcasing modern art.",
+      "latitude": 40.73061,
+      "longitude": -73.935242,
+      "event_date": "2023-12-20T18:00:00Z",
+      "categories": "Art",
+      "googleMapsUrl": "https://www.google.com/maps?q=40.73061,-73.935242"
+    }
+  }
+  ```
+
 - **GET** `/api/events` - Retrieve all events.
+
 - **GET** `/api/events/:id` - Retrieve a specific event by ID.
+  ```json
+  // Response
+  {
+    "id": 101,
+    "title": "Music Concert",
+    "description": "A live music concert featuring popular bands.",
+    "location": "Central Park, NY",
+    "event_date": "2023-12-15T19:00:00Z",
+    "categories": ["Music", "Live"],
+    "googleMapsUrl": "https://maps.google.com/?q=Central+Park"
+  }
+  ```
+
 - **PUT** `/api/events/:id` - Update an event by ID.
 - **DELETE** `/api/events/:id` - Delete an event by ID.
 
@@ -164,3 +248,6 @@ project-root/
 - **Google Maps Integration**: Each event includes a `googleMapsUrl` field that provides a link to the event's location on Google Maps.
 - **Favorites**: Users can save and manage favorite events.
 - **Real-Time Updates**: WebSocket-based real-time updates for event changes.
+
+    
+    
